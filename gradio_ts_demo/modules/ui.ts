@@ -1,4 +1,4 @@
-import { Alert, Button, Col, getConfigFromContext, Input, Interface, Paragraph, Row } from "./components";
+import { Alert, Button, Col, getConfigFromContext, Input, Interface, Paragraph, Row, TextArea } from "./components";
 
 export interface ILayoutInfo {
     id: string | number;
@@ -85,9 +85,9 @@ submit.bind('click', (name: string) => {
 
 // const config = getConfigFromContext(root);
 
-const interfaceExample = new Interface((name: string) => {
-    return [`hello world, ${name}`];
-}, [text], [paragraph]);
+const interfaceExample = new Interface((name: string, desc: string, profile: string) => {
+    return [`hello world, ${name}, ${desc}`, profile];
+}, [text, new TextArea(), new Input()], [paragraph, alert]);
 
 const config = getConfigFromContext(interfaceExample);
 
