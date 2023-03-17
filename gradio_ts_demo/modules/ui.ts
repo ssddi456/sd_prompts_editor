@@ -1,4 +1,4 @@
-import { Alert, Button, Col, getConfigFromContext, Input, Row } from "./components";
+import { Alert, Button, Col, getConfigFromContext, Input, Interface, Paragraph, Row } from "./components";
 
 export interface ILayoutInfo {
     id: string | number;
@@ -6,7 +6,7 @@ export interface ILayoutInfo {
 }
 
 export interface IComponentInfo {
-    type: string;
+    type: string | string[];
     visible?: boolean;
     props?: any;
     valueProps?: string;
@@ -68,7 +68,9 @@ export const temp_config: IRenderProps = {
 let text = new Input();
 let submit = new Button('Submit');
 let alert = new Alert();
-
+let paragraph = new Paragraph({
+    copyable: true,
+});
 const root = new Row([
     new Col([text]),
     new Col([submit]),
@@ -81,6 +83,12 @@ submit.bind('click', (name: string) => {
 
 // TODO: create a config from a function
 
-const config = getConfigFromContext(root);
+// const config = getConfigFromContext(root);
+
+const interfaceExample = new Interface((name: string) => {
+    return [`hello world, ${name}`];
+}, [text], [paragraph]);
+
+const config = getConfigFromContext(interfaceExample);
 
 export const getConfig = () => config;

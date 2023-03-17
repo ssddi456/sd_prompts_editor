@@ -28,6 +28,19 @@ function wrapRpc(funcName: string,) {
     };
 }
 
+function accessByKeyArray(obj: any, keys: string | string[]) {
+    let ret = obj;
+    let key = Array.isArray(keys) ? [...keys] : keys.split('.');
+    while (key.length > 0) {
+        const k = key.shift();
+        ret = ret[k!];
+        if (ret === undefined) {
+            return undefined;
+        }
+    }
+    return ret;
+}
+
 function bootstrapApp(config: any) {
     const React = window.React;
     const ReactDOM = window.ReactDOM;
@@ -91,7 +104,7 @@ function bootstrapApp(config: any) {
 
         render() {
             const { id, type, props, valueProps, value } = this.props;
-            const Component = antd[type];
+            const Component = accessByKeyArray(antd, type);
             const realProps = {
                 ...props,
             };
@@ -108,17 +121,29 @@ function bootstrapApp(config: any) {
                     });
                 };
             }
-
-            return (
-                <Component
-                    {...realProps}
-                    onChange={(e) => {
+            if (Component) {
+                return React.createElement(Component, {
+                    ...realProps,
+                    onChange: (e) => {
                         this.setState({
                             value: e?.target ? e?.target.value : e,
                         });
-                    }}
-                />
-            );
+                    }
+                });
+            } else if (type == '__fragment__') {
+                return React.createElement(React.Fragment, {
+                    ...realProps,
+                });
+            } else {
+                return React.createElement(type, {
+                    ...realProps,
+                    onChange: (e) => {
+                        this.setState({
+                            value: e?.target ? e?.target.value : e,
+                        });
+                    }
+                });
+            }
         }
     }
 
@@ -154,7 +179,7 @@ function bootstrapApp(config: any) {
                     return (
                         <Render
                             {...itemConfig}
-                            id={item.id}
+                            key={item.id}
                             ref={(el) => {
                                 elRefs[item.id] = el;
                             }}
